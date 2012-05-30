@@ -30,8 +30,7 @@ def login(request):
 
     u = None
     if auth_info['stat'] == 'ok':
-        profile = auth_info['profile']
-        u = auth.authenticate(profile=profile)
+        u = auth.authenticate(auth_info)
 
     if u is not None:
         request.user = u
