@@ -43,7 +43,7 @@ class JanrainBackend(object):
         """
         fn, ln = self.get_names(auth_info)
         u = User(
-                username=hash_user(auth_info),
+                username=self.hash_user(auth_info),
                 password='',
                 first_name=fn,
                 last_name=ln,
@@ -70,7 +70,7 @@ class JanrainBackend(object):
         # has a max_length of 30 so to ensure that we don't go over 
         # 30 characters we url-safe base64 encode the sha1 of the identifier 
         # returned from janrain and slice `=` from the end.
-        return safe_encode(sha1(profile['identifier']).digest())[:-1]
+        return safe_encode(sha1(auth_info['profile']['identifier']).digest())[:-1]
 
     def get_names(self, auth_info):
         """
