@@ -1,51 +1,41 @@
-from django.http import HttpResponse, HttpResponseRedirect
-from django.core.urlresolvers import reverse
+from django.http import HttpResponseRedirect
 from django.conf import settings
 from django.contrib import auth
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 
-import urllib, urllib2, json
+from janrain.api import JanrainClient
 
 @csrf_exempt
 def login(request):
+    redirect = HttpResponseRedirect
+    home = '/'
+
     try:
         token = request.POST['token']
     except KeyError:
-        # TODO: set ERROR to something
-        return HttpResponseRedirect('/')
+        return redirect(home)
 
-    api_params = {
-        'token': token,
-        'apiKey': settings.JANRAIN_RPX_API_KEY,
-        'format': 'json',
-    }
+    api_key = settings.JANRAIN_API_KEY
+    api_url = settings.get('JANRAIN_API_URL', 'https://rpxnow.com/api/v2')
+    client = JanrainClient(api_key, endpoint=api_url)
 
-    janrain_response = urllib2.urlopen(
-            "https://rpxnow.com/api/v2/auth_info",
-            urllib.urlencode(api_params))
-    resp_json = janrain_response.read()
-    auth_info = json.loads(resp_json)
+    auth_info = client.auth_info(token)
 
-    u = None
-    if auth_info['stat'] == 'ok':
-        u = auth.authenticate(auth_info)
+    if not auth_info['stat'] == 'ok':
+        return redirect(home)
 
-    if u is not None:
-        request.user = u
-        auth.login(request, u)
-    try:
-        return HttpResponseRedirect(request.GET['redirect_to'])
-    except KeyError:
-        return HttpResponseRedirect('/')
+    user = auth.authenticate(auth_info)
+
+    request.user = user
+    auth.login(request, user)
+
+    return redirect(request.GET.get('redirect_to', '/'))
 
 def logout(request):
     auth.logout(request)
-    try:
-        return HttpResponseRedirect(request.GET['redirect_to'])
-    except KeyError:
-        return HttpResponseRedirect('/')
+    return HttpResponseRedirect(request.GET.get('redirect_to', '/'))
 
 def loginpage(request):
     context = {'next':request.GET['next']}
@@ -54,4 +44,3 @@ def loginpage(request):
         context,
         context_instance=RequestContext(request)
     )
-    
