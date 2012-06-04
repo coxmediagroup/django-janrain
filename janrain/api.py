@@ -3,7 +3,7 @@ import json
 import requests
 import urlparse
 
-def JanrainClient(object):
+class JanrainClient(object):
     def __init__(self, api_key, endpoint='https://rpxnow.com/api/v2'):
         self.url = endpoint
         self.api_key = api_key
@@ -17,7 +17,7 @@ def JanrainClient(object):
         """
             Actually make a web request.
         """
-        setattr(data, 'api_key', getattr(data, 'api_key', self.api_key))
+        data['api_key'] = data.get('api_key', self.api_key)
         method = method.lower()
         full_url = urlparse.urljoin(self.url, path)
 
@@ -30,4 +30,4 @@ def JanrainClient(object):
         key = 'params' if method == 'get' else 'data'
         kwargs[key] = data
 
-        return json.loads(fun(**kwargs))
+        return json.loads(fun(**kwargs).text)
