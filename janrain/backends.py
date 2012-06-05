@@ -87,11 +87,10 @@ class JanrainBackend(object):
             if fname and lname:
                 return (fname, lname)
         dn = p.get('displayName')
-        if len(dn) > 1 and dn.find(' ') != -1:
-            (fname, lname) = dn.split(' ', 1)
-            return (fname, lname)
-        elif dn == None:
+        if dn is None:
             return ('', '')
+        elif len(dn) > 1 and ' ' in dn:
+            return dn.split(' ', 1)
         else:
             return (dn, '')
 

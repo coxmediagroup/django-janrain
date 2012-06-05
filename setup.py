@@ -9,7 +9,9 @@ setup(
     url='http://github.com/spuriousdata/django-janrain',
     packages=find_packages(),
     install_requires = [
-        'requests'
+        'mock',
+        'requests',
+        'unittest2',
     ],
     include_package_data=True,
     classifiers=[
