@@ -66,9 +66,9 @@ class JanrainBackend(object):
         :param auth_info: auth_info from Janrain
         :returns: hash string
         """
-        # django.contrib.auth.models.User.username is required and 
-        # has a max_length of 30 so to ensure that we don't go over 
-        # 30 characters we url-safe base64 encode the sha1 of the identifier 
+        # django.contrib.auth.models.User.username is required and
+        # has a max_length of 30 so to ensure that we don't go over
+        # 30 characters we url-safe base64 encode the sha1 of the identifier
         # returned from janrain and slice `=` from the end.
         return safe_encode(sha1(auth_info['profile']['identifier']).digest())[:-1]
 
