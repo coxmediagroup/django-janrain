@@ -10,9 +10,7 @@ setup(
     packages=find_packages(),
     install_requires = [
         'django',
-        'mock',
         'requests',
-        'unittest2',
     ],
     include_package_data=True,
     classifiers=[
