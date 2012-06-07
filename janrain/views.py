@@ -9,13 +9,10 @@ from janrain.api import JanrainClient
 
 @csrf_exempt
 def login(request):
-    redirect = HttpResponseRedirect
-    home = '/'
-
     try:
         token = request.POST['token']
     except KeyError:
-        return redirect(home)
+        return HttpResponseRedirect('/')
 
     api_key = settings.JANRAIN_API_KEY
     api_url = settings.get('JANRAIN_API_URL', 'https://rpxnow.com/api/v2')
@@ -24,14 +21,14 @@ def login(request):
     auth_info = client.auth_info(token)
 
     if not auth_info['stat'] == 'ok':
-        return redirect(home)
+        return HttpResponseRedirect('/')
 
     user = auth.authenticate(auth_info)
 
     request.user = user
     auth.login(request, user)
 
-    return redirect(request.GET.get('redirect_to', '/'))
+    return HttpResponseRedirect(request.GET.get('redirect_to', '/'))
 
 def logout(request):
     auth.logout(request)
