@@ -15,12 +15,12 @@ class JanrainBackend(object):
         # Being here means janrain was able to log in this user. We may or
         # may not know about this user yet; use find_user to check. If
         # they're new, hand their info to create_user to add a new User.
-        u = self.find_user(auth_info)
+        user = self.find_user(auth_info)
 
-        if not u:
-            u = self.create_user(auth_info)
+        if not user:
+            user = self.create_user(auth_info)
 
-        return u
+        return user
 
     def find_user(self, auth_info):
         """
@@ -79,20 +79,23 @@ class JanrainBackend(object):
         :param auth_info: auth_info from Janrain
         :returns: Tuple of (first_name, last_name). Either may be ''.
         """
-        p = auth_info['profile']
-        nt = p.get('name')
-        if type(nt) == dict:
-            fname = nt.get('givenName')
-            lname = nt.get('familyName')
-            if fname and lname:
-                return (fname, lname)
-        dn = p.get('displayName')
-        if dn is None:
-            return ('', '')
-        elif len(dn) > 1 and ' ' in dn:
-            return dn.split(' ', 1)
-        else:
-            return (dn, '')
+        profile = auth_info['profile']
+        names = profile.get('name')
+        if type(names) == dict: # TODO is this type check really needed?
+            # attempt to extract something like a first and last name
+            given_name = names.get('givenName', '')
+            family_name = names.get('familyName', '')
+            # either first or first and last (but not just last)
+            if given_name or (family_name and given_name):
+                return (given_name, family_name)
+
+        # fall back to display name; if found, use as 'first' name
+        display_name = profile.get('displayName')
+        if display_name:
+            return (display_name, '')
+
+        # give up
+        return ('', '')
 
     def get_email(self, auth_info):
         """
@@ -101,6 +104,5 @@ class JanrainBackend(object):
         :param auth_info: auth_info from Janrain
         :returns: either an email address or ''
         """
-        p = auth_info['profile']
-        return p.get('verifiedEmail') or p.get('email') or ''
-
+        profile = auth_info['profile']
+        return profile.get('verifiedEmail') or profile.get('email') or ''
