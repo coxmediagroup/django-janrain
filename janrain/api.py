@@ -22,7 +22,7 @@ class JanrainClient(object):
         full_url = urlparse.urljoin(self.url, path)
 
         try:
-            fun = partial(getattr(requests, method), full_url)
+            hit_url = partial(getattr(requests, method), full_url)
         except AttributeError:
             raise ValueError("Invalid HTTP method %s" % method)
 
@@ -30,4 +30,4 @@ class JanrainClient(object):
         key = 'params' if method == 'get' else 'data'
         kwargs[key] = data
 
-        return json.loads(fun(**kwargs).text)
+        return json.loads(hit_url(**kwargs).text)
