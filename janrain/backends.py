@@ -86,12 +86,10 @@ class JanrainBackend(object):
         if type(names) == dict: # TODO is this type check really needed?
             # attempt to extract something like a first and last name
             given_name = names.get('givenName', '')
+            display_name = names.get('displayName', '')
             family_name = names.get('familyName', '')
-            # either first or first and last (but not just last)
-            if (family_name and given_name) or given_name:
-                return (given_name, family_name)
-            else:
-                return (profile.get('displayName', ''), '')
+
+            return (given_name or display_name, family_name)
 
     def get_email(self, auth_info):
         """
