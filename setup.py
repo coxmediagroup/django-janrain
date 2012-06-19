@@ -9,7 +9,7 @@ setup(
     url='http://github.com/spuriousdata/django-janrain',
     packages=find_packages(),
     install_requires = [
-        'django',
+        # 'django', sigh.
         'requests',
     ],
     include_package_data=True,

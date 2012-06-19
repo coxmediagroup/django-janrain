@@ -85,23 +85,17 @@ class JanrainBackend(object):
         :param auth_info: auth_info from Janrain
         :returns: Tuple of (first_name, last_name). Either may be ''.
         """
+        # TODO this is a mess. I'll probably change it after working with some
+        # actual data.
         profile = auth_info['profile']
         names = profile.get('name')
         if type(names) == dict: # TODO is this type check really needed?
             # attempt to extract something like a first and last name
             given_name = names.get('givenName', '')
+            display_name = names.get('displayName', '')
             family_name = names.get('familyName', '')
-            # either first or first and last (but not just last)
-            if given_name or (family_name and given_name):
-                return (given_name, family_name)
 
-        # fall back to display name; if found, use as 'first' name
-        display_name = profile.get('displayName')
-        if display_name:
-            return (display_name, '')
-
-        # give up
-        return ('', '')
+            return (given_name or display_name, family_name)
 
     def get_email(self, auth_info):
         """
