@@ -22,6 +22,12 @@ class JanrainBackend(object):
 
         return user
 
+    def get_user(self, user_id):
+        try:
+            return User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return None
+
     def find_user(self, auth_info):
         """
         Looks up a user in the User table based on auth_info

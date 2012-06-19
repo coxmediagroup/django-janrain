@@ -15,7 +15,7 @@ def login(request):
         return HttpResponseRedirect('/')
 
     api_key = settings.JANRAIN_API_KEY
-    api_url = settings.get('JANRAIN_API_URL', 'https://rpxnow.com/api/v2')
+    api_url = getattr(settings, 'JANRAIN_API_URL', 'https://rpxnow.com/api/v2/')
     client = JanrainClient(api_key, endpoint=api_url)
 
     auth_info = client.auth_info(token)
@@ -23,7 +23,7 @@ def login(request):
     if not auth_info['stat'] == 'ok':
         return HttpResponseRedirect('/')
 
-    user = auth.authenticate(auth_info)
+    user = auth.authenticate(auth_info=auth_info)
 
     request.user = user
     auth.login(request, user)
