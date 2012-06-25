@@ -4,6 +4,6 @@ from janrain.views import JanrainLoginView, JanrainLogoutView, JanrainLoginPageV
 urlpatterns = patterns('',
     url(r'^login/$', JanrainLoginView.as_view(), name='login'),
     url(r'^logout/$', JanrainLogoutView.as_view(), name='logout'),
-    url(r'^loginpage/$', JanrainLoginPageView, name='loginpage'),
-    url(r'^xdcomm.html$', JanrainXDCommView, name='xdcomm'),
+    url(r'^loginpage/$', JanrainLoginPageView.as_view(), name='loginpage'),
+    url(r'^xdcomm.html$', JanrainXDCommView.as_view(), name='xdcomm'),
 )
