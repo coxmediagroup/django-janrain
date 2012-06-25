@@ -8,7 +8,7 @@ from django.utils.decorators import method_decorator
 
 from janrain.api import JanrainClient
 
-from django.views.generic import View
+from django.views.generic import View, TemplateView
 
 class JanrainView(View):
     pass
@@ -50,3 +50,6 @@ class JanrainLoginPageView(JanrainView):
             context,
             context_instance=RequestContext(request)
         )
+
+class JanrainXDCommView(TemplateView):
+    template='janrain/xdcomm.html'
