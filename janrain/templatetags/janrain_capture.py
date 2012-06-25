@@ -21,11 +21,7 @@ class JanrainCaptureNode(template.Node):
 
     def render(self, context):
         return """
-        <iframe src="https://{app_id}.janraincapture.com/oauth/{signin_or_register}?
-            response_type=code&
-            redirect_url=http://{domain}/janrain/oauth_redirect&
-            client_id={client_id}&
-            xdreceiver=http://{domain}/janrain/xdcomm.html"></iframe>
+        <iframe src="https://{app_id}.janraincapture.com/oauth/{signin_or_register}?response_type=code&redirect_url=http://{domain}/janrain/oauth_redirect&client_id={client_id}&xdreceiver=http://{domain}/janrain/xdcomm.html"></iframe>
         """.format(**self.context)
 
 def janrain_capture(signin_or_register, parser, token):
