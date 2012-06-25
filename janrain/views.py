@@ -52,4 +52,4 @@ class JanrainLoginPageView(JanrainView):
         )
 
 class JanrainXDCommView(TemplateView):
-    template='janrain/xdcomm.html'
+    template_name='janrain/xdcomm.html'
