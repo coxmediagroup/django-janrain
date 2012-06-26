@@ -6,7 +6,7 @@ from janrain.api import JanrainClient
 
 class MockRequestsJsonResponse(object):
     def __init__(self, data):
-        self.text = json.dumps(data)
+        self.content = json.dumps(data)
 
 class TestAPI(TestCase):
     def setUp(self):
@@ -26,7 +26,7 @@ class TestAPI(TestCase):
         self.reqs.get = mock.Mock(return_value=MockRequestsJsonResponse(dict(hello='there')))
         with mock.patch('janrain.api.requests', self.reqs):
             self.client._make_request('path', data=dict(ohno='youdidnt'))
-            self.reqs.get.assert_called_with('path', params=dict(ohno='youdidnt', api_key='test_key'))
+            self.reqs.get.assert_called_with('path', params=dict(ohno='youdidnt', apiKey='test_key'))
 
     def test__make_request_post(self):
         self.reqs.post = mock.Mock(return_value=MockRequestsJsonResponse(dict(you='guys')))
@@ -40,7 +40,7 @@ class TestAPI(TestCase):
         self.reqs.post = mock.Mock(return_value=MockRequestsJsonResponse(dict(you='guys')))
         with mock.patch('janrain.api.requests', self.reqs):
             self.client._make_request('path', method='post', data=dict(ohno='youdidnt'))
-            self.reqs.post.assert_called_with('path', data=dict(ohno='youdidnt', api_key='test_key'))
+            self.reqs.post.assert_called_with('path', data=dict(ohno='youdidnt', apiKey='test_key'))
 
     def test__make_request_bad_method(self):
         self.assertRaises(ValueError, self.client._make_request, 'path', method='foobarbaz')
@@ -51,4 +51,4 @@ class TestAPI(TestCase):
             auth_info = self.client.auth_info('test_token')
             self.assertEqual(len(auth_info.keys()), 1, 'got back our json')
             self.assertEqual(auth_info['hello'], 'there', 'got back our json')
-            self.reqs.get.assert_called_with('api_info', params=dict(token='test_token', api_key='test_key'))
+            self.reqs.get.assert_called_with('auth_info', params=dict(token='test_token', apiKey='test_key'))

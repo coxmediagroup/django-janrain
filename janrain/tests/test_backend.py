@@ -41,15 +41,6 @@ class TestBackend(TestCase):
         self.assertEqual(fname, 'nate')
         self.assertEqual(lname, 'smith')
 
-    def test_get_names_just_display_with_space(self):
-        del self.auth_info['profile']['name']['givenName']
-        del self.auth_info['profile']['name']['familyName']
-        self.auth_info['profile']['displayName'] = 'nathaniel smith'
-
-        fname, lname = self.backend.get_names(self.auth_info)
-        self.assertEqual(fname, 'nathaniel')
-        self.assertEqual(lname, 'smith')
-
     def test_get_names_just_display_no_space(self):
         del self.auth_info['profile']['name']['givenName']
         del self.auth_info['profile']['name']['familyName']

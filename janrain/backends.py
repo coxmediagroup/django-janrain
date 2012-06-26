@@ -92,7 +92,7 @@ class JanrainBackend(object):
         if type(names) == dict: # TODO is this type check really needed?
             # attempt to extract something like a first and last name
             given_name = names.get('givenName', '')
-            display_name = names.get('displayName', '')
+            display_name = profile.get('displayName', '')
             family_name = names.get('familyName', '')
 
             return (given_name or display_name, family_name)
