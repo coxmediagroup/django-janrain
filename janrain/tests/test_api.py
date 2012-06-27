@@ -44,11 +44,3 @@ class TestAPI(TestCase):
 
     def test__make_request_bad_method(self):
         self.assertRaises(ValueError, self.client._make_request, 'path', method='foobarbaz')
-
-    def test_auth_info(self):
-        self.reqs.get = mock.Mock(return_value=MockRequestsJsonResponse(dict(hello='there')))
-        with mock.patch('janrain.api.requests', self.reqs):
-            auth_info = self.client.auth_info('test_token')
-            self.assertEqual(len(auth_info.keys()), 1, 'got back our json')
-            self.assertEqual(auth_info['hello'], 'there', 'got back our json')
-            self.reqs.get.assert_called_with('auth_info', params=dict(token='test_token', apiKey='test_key'))
