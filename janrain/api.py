@@ -8,11 +8,33 @@ class JanrainClient(object):
         self.url = endpoint
         self.api_key = api_key
 
+    # Capture - Oauth
+    def oauth_token(self, code, redirect_url, client_id, client_secret, grant_type='authorization_code'):
+        return self._make_request('oath/token', method='post', data=dict(
+            code=code,
+            redirect_url=redirect_url,
+            grant_type=grant_type,
+            client_id=client_id,
+            client_secret=client_secret
+        ))
+
+    # Capture - Entity
+    def entity(self, access_token=None):
+        if access_token:
+            return self._make_request('entity',
+                headers=dict(Authorization='OAuth %s' % access_token)
+            )
+        else:
+            # TODO support other way to call entity
+            pass
+
+    # Engage
     def auth_info(self, token):
         return self._make_request('auth_info', data=dict(token=token))
 
+    # Engage - Mappings
     def map(self, identifier, primary_key, overwrite=True):
-        return self._make_request('map', data=dict(
+        return self._make_request('map', method='post', data=dict(
             identifier=identifier,
             primaryKey=primary_key,
             overwrite='true' if overwrite else 'false'
@@ -20,7 +42,7 @@ class JanrainClient(object):
 
     # TODO you know, the rest of the API.
 
-    def _make_request(self, path, method='get', data={}):
+    def _make_request(self, path, method='get', data={}, headers={}):
         """
             Actually make a web request.
         """
@@ -33,7 +55,7 @@ class JanrainClient(object):
         except AttributeError:
             raise ValueError("Invalid HTTP method %s" % method)
 
-        kwargs = {}
+        kwargs = dict(headers=headers)
         key = 'params' if method == 'get' else 'data'
         kwargs[key] = data
 

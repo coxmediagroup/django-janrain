@@ -13,7 +13,71 @@ from django.views.generic import View, TemplateView
 class JanrainView(View):
     pass
 
+class JanrainOauthRedirectView(JanrainView):
+    """
+        Redirect URL for Capture
+
+        Capture redirects to the specified redirect_uri with a code query
+        parameter. Your redirect_uri must then exchange the code for an
+        access_token using the oauth/token API call. Once you have an
+        access_token, you can use it read and update the end user’s profile
+        data with the entity and entity.update API calls. If a user has chosen
+        to use third party authentication, the Capture system will add the
+        query parameters engage.identifier and engage.providerName to the
+        redirect_uri.
+    """
+    @method_decorator(csrf_exempt)
+    def post(self, request, *args, **kwargs):
+        try:
+            # TODO probably wrong
+            code = request.POST['code']
+        except KeyError:
+            return HttpResponseRedirect('/')
+
+        api_key = settings.JANRAIN_API_KEY
+        client_id = settings.JANRAIN_CAPTURE_CLIENT_ID
+        client_secret = settings.JANRAIN_CAPTURE_CLIENT_SECRET
+        redirect_uri = settings.JANRAIN_CAPTURE_REDIRECT_URI
+
+        # TODO wrong
+        api_url = getattr(settings, 'JANRAIN_API_URL', 'https://rpxnow.com/api/v2/')
+        client = JanrainClient(api_key, endpoint=api_url)
+
+        response = client.oauth_token(
+            code=code,
+            redirect_uri=redirect_uri,
+            grant_type='authorization_code',
+            client_id=client_id,
+            client_secret=client_secret,
+        )
+
+        if not response or 'error' in response:
+            return HttpResponseRedirect('/')
+
+        try:
+            access_token = response['access_token']
+            # TODO guess i don't need this?
+            # refresh_token = response['refresh_token']
+        except KeyError:
+            return HttpResponseRedirect('/')
+
+        response = client.entity(access_token=access_token)
+
+        if not response.get('stat') == 'ok':
+            return HttpResponseRedirect('/')
+
+        # TODO user data in response; need an invocation like:
+        user = auth.authenticate(auth_info=response)
+        request.user = user
+        auth.login(request, user)
+
+        return HttpResponseRedirect(request.GET.get('redirect_to', '/'))
+
+
 class JanrainLoginView(JanrainView):
+    """
+        Redirect URL for Engage
+    """
     @method_decorator(csrf_exempt)
     def post(self, request, *args, **kwargs):
         try:
