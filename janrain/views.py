@@ -20,7 +20,7 @@ class JanrainOauthRedirectView(JanrainView):
         Capture redirects to the specified redirect_uri with a code query
         parameter. Your redirect_uri must then exchange the code for an
         access_token using the oauth/token API call. Once you have an
-        access_token, you can use it read and update the end user’s profile
+        access_token, you can use it to read and update the end user's profile
         data with the entity and entity.update API calls. If a user has chosen
         to use third party authentication, the Capture system will add the
         query parameters engage.identifier and engage.providerName to the
