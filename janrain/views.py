@@ -27,10 +27,10 @@ class JanrainOauthRedirectView(JanrainView):
         redirect_uri.
     """
     @method_decorator(csrf_exempt)
-    def post(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         try:
             # TODO probably wrong
-            code = request.POST['code']
+            code = request.REQUEST['code']
         except KeyError:
             return HttpResponseRedirect('/')
 
@@ -38,9 +38,9 @@ class JanrainOauthRedirectView(JanrainView):
         client_id = settings.JANRAIN_CAPTURE_CLIENT_ID
         client_secret = settings.JANRAIN_CAPTURE_CLIENT_SECRET
         redirect_uri = settings.JANRAIN_CAPTURE_REDIRECT_URI
+        app_id = settings.JANRAIN_CAPTURE_APP_ID
 
-        # TODO wrong
-        api_url = getattr(settings, 'JANRAIN_API_URL', 'https://rpxnow.com/api/v2/')
+        api_url = 'https://%s.janraincapture.com/' % app_id
         client = JanrainClient(api_key, endpoint=api_url)
 
         response = client.oauth_token(
