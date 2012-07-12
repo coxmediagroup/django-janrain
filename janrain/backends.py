@@ -3,6 +3,11 @@ from hashlib import sha1
 from base64 import urlsafe_b64encode as safe_encode
 
 class JanrainUser(object):
+    """
+        This class acts as a quantum container for user data from either the
+        Engage or Capture (entity) APIs. Needed properties resolve themselves
+        based on the topology of the user_data passed to the constructor.
+    """
     def __new__(self,user_data):
         self.data = user_data
 
@@ -26,6 +31,7 @@ class JanrainUser(object):
     def hashed(self):
         """
         Uniquely identify this user as a hash.
+
         :returns: hash string
         """
 
@@ -84,7 +90,7 @@ class JanrainBackend(object):
         This function is used to transform a successful response from Janrain
         into an actually authenticated user.
 
-        :param auth_info: dictionary of user info from Janrain
+        :param user_data: dictionary of user info from Janrain (either Engage or Capture/Entity)
         :returns: User, either one found in the database or a new one
         """
 
@@ -100,6 +106,9 @@ class JanrainBackend(object):
         return user
 
     def get_user(self, user_id):
+        """
+            Must implement this. Deserializes a user id.
+        """
         try:
             return User.objects.get(pk=user_id)
         except User.DoesNotExist:
@@ -107,7 +116,8 @@ class JanrainBackend(object):
 
     def find_user(self, janrain_user):
         """
-        Looks up a user in the User table based on auth_info.
+        Looks up a user in the User table that corresponds to the passed
+        JanrainUser.
 
         This is intended to be overridden.
 
@@ -121,7 +131,7 @@ class JanrainBackend(object):
 
     def create_user(self, janrain_user):
         """
-        Creates a User based on auth_info.
+        Creates a User based on janrain_user.
 
         This is intended to be overridden.
 

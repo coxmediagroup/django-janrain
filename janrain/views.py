@@ -12,25 +12,23 @@ from janrain.api import JanrainClient
 from django.views.generic import View, TemplateView
 
 class JanrainView(View):
-    pass
-
-class JanrainOauthRedirectView(JanrainView):
     """
-        Redirect URL for Capture
-
-        Capture redirects to the specified redirect_uri with a code query
-        parameter. Your redirect_uri must then exchange the code for an
-        access_token using the oauth/token API call. Once you have an
-        access_token, you can use it to read and update the end user's profile
-        data with the entity and entity.update API calls. If a user has chosen
-        to use third party authentication, the Capture system will add the
-        query parameters engage.identifier and engage.providerName to the
-        redirect_uri.
+        Sets up the non-cacheability of all views subclassed from here. They
+        all work with sessions and request/response objects and should never be
+        allowed to stay in a cache.
     """
     @method_decorator(never_cache)
     def dispatch(self, *args, **kwargs):
-        return super(JanrainOauthRedirectView, self).dispatch(*args, **kwargs)
+        return super(JanrainView, self).dispatch(*args, **kwargs)
 
+
+class JanrainOauthRedirectView(JanrainView):
+    """
+        The ``redirect_uri`` used with the Capture API.  Accepts a ``code``
+        parameter in GET that is exchanged for an access_token. With the access
+        token we can then read/update the authenticated user's information.
+        Takes care of authenticating/logging in user.
+    """
     @method_decorator(csrf_exempt)
     def get(self, request, *args, **kwargs):
         try:
@@ -60,8 +58,6 @@ class JanrainOauthRedirectView(JanrainView):
 
         try:
             access_token = response['access_token']
-            # TODO guess i don't need this?
-            # refresh_token = response['refresh_token']
         except KeyError:
             return HttpResponseRedirect('/')
 
@@ -72,7 +68,6 @@ class JanrainOauthRedirectView(JanrainView):
 
         user_data = response['result']
 
-        # TODO user data in response; need an invocation like:
         user = auth.authenticate(user_data=user_data)
         request.user = user
         auth.login(request, user)
@@ -82,7 +77,9 @@ class JanrainOauthRedirectView(JanrainView):
 
 class JanrainLoginView(JanrainView):
     """
-        Redirect URL for Engage
+        Redirect URL for Engage. Looks for ``token`` parameter in ``POST`` that
+        is used to request profile information for the authenticating user.
+        Takes care of authenticating/logging in user.
     """
     @method_decorator(csrf_exempt)
     def post(self, request, *args, **kwargs):
@@ -107,20 +104,14 @@ class JanrainLoginView(JanrainView):
 
         return HttpResponseRedirect(request.GET.get('redirect_to', '/'))
 
-class JanrainLogoutView(JanrainView):
-    @method_decorator(never_cache)
-    def dispatch(self, *args, **kwargs):
-        return super(JanrainLogoutView, self).dispatch(*args, **kwargs)
 
+class JanrainLogoutView(JanrainView):
     def get(self, request, *args, **kwargs):
         auth.logout(request)
         return HttpResponseRedirect(request.GET.get('redirect_to', '/'))
 
-class JanrainLoginPageView(JanrainView):
-    @method_decorator(never_cache)
-    def dispatch(self, *args, **kwargs):
-        return super(JanrainLoginPageView, self).dispatch(*args, **kwargs)
 
+class JanrainLoginPageView(JanrainView):
     def get(self, request, *args, **kwargs):
         context = {'next':request.GET['next']}
         return render_to_response(
@@ -128,6 +119,7 @@ class JanrainLoginPageView(JanrainView):
             context,
             context_instance=RequestContext(request)
         )
+
 
 class JanrainXDCommView(TemplateView):
     template_name='xdcomm.html'
