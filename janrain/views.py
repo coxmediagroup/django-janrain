@@ -5,6 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.utils.decorators import method_decorator
+from django.views.decorators.cache import never_cache
 
 from janrain.api import JanrainClient
 
@@ -26,10 +27,13 @@ class JanrainOauthRedirectView(JanrainView):
         query parameters engage.identifier and engage.providerName to the
         redirect_uri.
     """
+    @method_decorator(never_cache)
+    def dispatch(self, *args, **kwargs):
+        return super(JanrainOauthRedirectView, self).dispatch(*args, **kwargs)
+
     @method_decorator(csrf_exempt)
     def get(self, request, *args, **kwargs):
         try:
-            # TODO probably wrong
             code = request.REQUEST['code']
         except KeyError:
             return HttpResponseRedirect('/')
@@ -104,11 +108,19 @@ class JanrainLoginView(JanrainView):
         return HttpResponseRedirect(request.GET.get('redirect_to', '/'))
 
 class JanrainLogoutView(JanrainView):
+    @method_decorator(never_cache)
+    def dispatch(self, *args, **kwargs):
+        return super(JanrainLogoutView, self).dispatch(*args, **kwargs)
+
     def get(self, request, *args, **kwargs):
         auth.logout(request)
         return HttpResponseRedirect(request.GET.get('redirect_to', '/'))
 
 class JanrainLoginPageView(JanrainView):
+    @method_decorator(never_cache)
+    def dispatch(self, *args, **kwargs):
+        return super(JanrainLoginPageView, self).dispatch(*args, **kwargs)
+
     def get(self, request, *args, **kwargs):
         context = {'next':request.GET['next']}
         return render_to_response(
