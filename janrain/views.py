@@ -66,8 +66,10 @@ class JanrainOauthRedirectView(JanrainView):
         if not response.get('stat') == 'ok':
             return HttpResponseRedirect('/')
 
+        user_data = response['result']
+
         # TODO user data in response; need an invocation like:
-        user = auth.authenticate(user_data=response['result'])
+        user = auth.authenticate(user_data=user_data)
         request.user = user
         auth.login(request, user)
 

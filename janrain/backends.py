@@ -4,14 +4,23 @@ from base64 import urlsafe_b64encode as safe_encode
 
 class JanrainUser(object):
     def __new__(self,user_data):
-        # TODO create canonical user_data
-        self.user_data = dict()
-        if 'profile' in user_data:
-            # engage/auth_info case
-            pass
-        else:
-            # capture/entity case
-            pass
+        self.data = user_data
+
+    @property
+    def uuid(self):
+        """
+        A unique code for this user.
+
+        :returns: string
+        """
+        uuid = self.data.get('uuid')
+        if not uuid:
+            try:
+                uuid = self.data['profile']['identifer']
+            except KeyError:
+                raise ValueError("Cannot uniquely identifer user: %s" % self.data)
+
+        return uuid
 
     @property
     def hashed(self):
@@ -19,13 +28,13 @@ class JanrainUser(object):
         Uniquely identify this user as a hash.
         :returns: hash string
         """
-        raise NotImplemented
+
         # django.contrib.auth.models.User.username is required and
         # has a max_length of 30 so to ensure that we don't go over
         # 30 characters we url-safe base64 encode the sha1 of the identifier
         # returned from janrain and slice `=` from the end.
         # TODO this obviously won't work until user_data is canonicalized
-        return safe_encode(sha1(self.data['profile']['identifier']).digest())[:-1]
+        return safe_encode(sha1(self.uuid).digest())[:-1]
 
     @property
     def names(self):
@@ -34,29 +43,39 @@ class JanrainUser(object):
 
         :returns: Tuple of (first_name, last_name). Either may be ''.
         """
-        raise NotImplemented
-        # TODO this is a mess. I'll probably change it after working with some
-        # actual data.
-        profile = self.user_data['profile']
-        names = profile.get('name')
-        if type(names) == dict: # TODO is this type check really needed?
-            # attempt to extract something like a first and last name
-            given_name = names.get('givenName', '')
-            display_name = profile.get('displayName', '')
-            family_name = names.get('familyName', '')
 
-            return (given_name or display_name, family_name)
+        given_name = self.data.get('givenName', '')
+        family_name = self.data.get('familyName', '')
+        display_name = self.data.get('displayName', '')
+
+        if not any([given_name, family_name, display_name]):
+            try:
+                names = self.data['profile']['names']
+                given_name = names.get('givenName', '')
+                family_name = names.get('familyName', '')
+                display_name = names.get('displayName', '')
+            except KeyError:
+                return ('', '')
+
+        return (given_name or display_name, family_name)
 
     @property
     def email(self):
-        raise NotImplemented
         """
         Extract an email from user's data if possible.
 
         :returns: either an email address or ''
         """
-        profile = self.user_data['profile']
-        return profile.get('verifiedEmail') or profile.get('email') or ''
+        email = self.data.get('email')
+
+        if not email:
+            try:
+                profile = self.data['profile']
+            except KeyError:
+                return ''
+            email = profile.get('verifiedEmail') or profile.get('email') or ''
+
+        return email
 
 class JanrainBackend(object):
 
