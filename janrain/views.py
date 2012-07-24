@@ -40,9 +40,9 @@ class JanrainOauthRedirectView(JanrainView):
         client_id = settings.JANRAIN_CAPTURE_CLIENT_ID
         client_secret = settings.JANRAIN_CAPTURE_CLIENT_SECRET
         redirect_uri = settings.JANRAIN_CAPTURE_REDIRECT_URI
-        app_id = settings.JANRAIN_CAPTURE_APP_ID
 
-        api_url = 'https://%s.janraincapture.com/' % app_id
+        # api_url should be something like 'https://%s.janraincapture.com/' % app_id
+        api_url = settings.JANRAIN_API_URL
         client = JanrainClient(api_key, endpoint=api_url)
 
         response = client.oauth_token(

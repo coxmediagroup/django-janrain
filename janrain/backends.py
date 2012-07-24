@@ -57,11 +57,12 @@ class JanrainUser(object):
         if not any([given_name, family_name, display_name]):
             try:
                 names = self.data['profile']['names']
-                given_name = names.get('givenName', '')
-                family_name = names.get('familyName', '')
-                display_name = names.get('displayName', '')
             except KeyError:
                 return ('', '')
+
+            given_name = names.get('givenName', '')
+            family_name = names.get('familyName', '')
+            display_name = names.get('displayName', '')
 
         return (given_name or display_name, family_name)
 
@@ -79,7 +80,7 @@ class JanrainUser(object):
                 profile = self.data['profile']
             except KeyError:
                 return ''
-            email = profile.get('verifiedEmail') or profile.get('email') or ''
+            email = profile.get('verifiedEmail', '') or profile.get('email', '')
 
         return email
 

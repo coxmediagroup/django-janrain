@@ -108,15 +108,15 @@ class TestBackend(TestCase):
         muser.objects.get = mock.Mock()
         self.muser = muser
 
-        self.user = mock.Mock()
+        self.janrain_user = mock.Mock()
 
     def test_find_user_found(self):
         with mock.patch('janrain.backends.User', self.muser):
             self.muser.objects.get.return_value = True
-            self.assertTrue(self.backend.find_user(self.user))
+            self.assertTrue(self.backend.find_user(self.janrain_user))
 
     def test_find_user_not_found(self):
         with mock.patch('janrain.backends.User', self.muser):
             self.muser.objects.get.side_effect = self.muser.DoesNotExist
-            self.assertEqual(self.backend.find_user(self.user), None)
+            self.assertEqual(self.backend.find_user(self.janrain_user), None)
 
