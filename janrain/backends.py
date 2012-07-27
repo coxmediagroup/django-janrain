@@ -8,8 +8,17 @@ class JanrainUser(object):
         Engage or Capture (entity) APIs. Needed properties resolve themselves
         based on the topology of the user_data passed to the constructor.
     """
-    def __new__(self,user_data):
+    def __init__(self, user_data):
         self.data = user_data
+
+    def __getitem__(self, key):
+        return self.data[key]
+
+    def get(self, key, default=None):
+        try:
+            return self[key]
+        except KeyError:
+            return default
 
     @property
     def uuid(self):
@@ -23,7 +32,7 @@ class JanrainUser(object):
             try:
                 uuid = self.data['profile']['identifer']
             except KeyError:
-                raise ValueError("Cannot uniquely identifer user: %s" % self.data)
+                raise ValueError("Cannot uniquely identify user: %s" % self.data)
 
         return uuid
 

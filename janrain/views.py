@@ -1,3 +1,5 @@
+from urlparse import urljoin
+
 from django.http import HttpResponseRedirect
 from django.conf import settings
 from django.contrib import auth
@@ -39,10 +41,15 @@ class JanrainOauthRedirectView(JanrainView):
         api_key = settings.JANRAIN_API_KEY
         client_id = settings.JANRAIN_CAPTURE_CLIENT_ID
         client_secret = settings.JANRAIN_CAPTURE_CLIENT_SECRET
-        redirect_uri = settings.JANRAIN_CAPTURE_REDIRECT_URI
+
+        # construct the uri for this request
+        protocol = 'https' if request.is_secure() else 'http'
+        host = request.get_host()
+        path = request.path
+        redirect_uri = urljoin("%s://%s" % (protocol, host), path)
 
         # api_url should be something like 'https://%s.janraincapture.com/' % app_id
-        api_url = settings.JANRAIN_API_URL
+        api_url = settings.JANRAIN_CAPTURE_API_URL
         client = JanrainClient(api_key, endpoint=api_url)
 
         response = client.oauth_token(
@@ -54,6 +61,7 @@ class JanrainOauthRedirectView(JanrainView):
         )
 
         if not response or 'error' in response:
+            print response
             return HttpResponseRedirect('/')
 
         try:
