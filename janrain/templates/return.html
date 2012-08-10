@@ -1,8 +1,10 @@
 <html>
 <head></head>
 <body>
-    <script>
-        parent.location = parent.cmg.parse_qs(parent.location.search)['return'] || parent.location
+    <script type="text/javascript">
+        var return_page = parent.cmg.parse_qs(parent.location.search)['return']
+        if (return_page) { parent.location = return_page }
     </script>
+    <h1>Thanks for logging in.</h1>
 </body>
 </html>
