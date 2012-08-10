@@ -80,7 +80,10 @@ class JanrainOauthRedirectView(JanrainView):
         request.user = user
         auth.login(request, user)
 
-        return HttpResponseRedirect(request.GET.get('redirect_to', '/'))
+        return HttpResponseRedirect('/janrain/return.html')
+
+class JanrainReturnView(TemplateView):
+    template_name='return.html'
 
 
 class JanrainLoginView(JanrainView):
