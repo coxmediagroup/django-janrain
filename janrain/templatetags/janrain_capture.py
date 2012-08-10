@@ -6,20 +6,48 @@
                xd_receiver=http%3A//www.example.com/xdcomm.html"></iframe>
 """
 from functools import partial
+import re
 
 from django import template
 
+# TODO surely a helper exists for this in Django
+def literal_or_var(thing):
+    """
+    Given some string, return its value without quote delimiters or a
+    Variable object representing the string. For example,
+
+    a = self.literal_or_var('"hello"')
+        a is 'hello'
+    a = self.literal_or_var('hello')
+        a is Variable('hello')
+
+    :param thing: A string of the form "hello", 'hello', or hello
+    :returns: either a Variable or a string
+    """
+    literal_re = '^[\'"].*[\'"]$'
+    strip_quotes = lambda s: re.sub('[\'"]', '', s)
+
+    if re.match(literal_re, thing):
+        return strip_quotes(thing)
+    else:
+        return template.Variable(thing)
+
+def maybe_resolve(context, thing):
+    return thing.resolve(context) if type(thing) == template.Variable else thing
 
 class JanrainCaptureNode(template.Node):
     def __init__(self, signin_or_register, app_id, client_id, domain):
         self.context = dict(
             signin_or_register=signin_or_register,
-            app_id = app_id,
-            client_id = client_id,
-            domain = domain
+            app_id = literal_or_var(app_id),
+            client_id = literal_or_var(client_id),
+            domain = literal_or_var(domain),
         )
 
     def render(self, context):
+        for key in ['app_id', 'client_id', 'domain']:
+            self.context[key] = maybe_resolve(context, self.context[key])
+
         return """
         <iframe width="500px" height="1000px" src="https://{app_id}.janraincapture.com/oauth/{signin_or_register}?response_type=code&redirect_uri=http://{domain}/janrain/oauth_redirect&client_id={client_id}&xdreceiver=http://{domain}/janrain/xdcomm.html"></iframe>
         """.format(**self.context)
