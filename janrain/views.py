@@ -50,7 +50,7 @@ class JanrainOauthRedirectView(JanrainView):
 
         # api_url should be something like 'https://%s.janraincapture.com/' % app_id
         api_url = settings.JANRAIN_CAPTURE_API_URL
-        client = JanrainClient(api_key, endpoint=api_url)
+        client = JanrainClient(api_key, client_id, client_secret, endpoint=api_url)
 
         response = client.oauth_token(
             code=code,
@@ -101,6 +101,7 @@ class JanrainLoginView(JanrainView):
 
         api_key = settings.JANRAIN_API_KEY
         api_url = getattr(settings, 'JANRAIN_API_URL', 'https://rpxnow.com/api/v2/')
+        # TODO this is now broken
         client = JanrainClient(api_key, endpoint=api_url)
 
         auth_info = client.auth_info(token)

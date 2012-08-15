@@ -4,9 +4,11 @@ import requests
 import urlparse
 
 class JanrainClient(object):
-    def __init__(self, api_key, endpoint='https://rpxnow.com/api/v2/'):
+    def __init__(self, api_key, client_id, client_secret, endpoint='https://rpxnow.com/api/v2/'):
         self.url = endpoint
         self.api_key = api_key
+        self.client_id = client_id
+        self.client_secret = client_secret
 
     # Capture - Oauth
     def oauth_token(self, code, redirect_uri, client_id, client_secret, grant_type='authorization_code'):
@@ -14,8 +16,8 @@ class JanrainClient(object):
             code=code,
             redirect_uri=redirect_uri,
             grant_type=grant_type,
-            client_id=client_id,
-            client_secret=client_secret
+            client_id=self.client_id,
+            client_secret=self.client_secret
         ))
 
     # Capture - Entity
@@ -27,6 +29,15 @@ class JanrainClient(object):
         else:
             # TODO support other way to call entity
             pass
+
+    def entity_update(self, uuid, type_name, update):
+        return self._make_request('entity.update', method='post', data=dict(
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            type_name=type_name,
+            uuid=uuid,
+            value=json.dumps(update)
+        ))
 
     # Engage
     def auth_info(self, token):
