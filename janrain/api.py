@@ -21,14 +21,21 @@ class JanrainClient(object):
         ))
 
     # Capture - Entity
-    def entity(self, access_token=None):
+    def entity(self, uuid=None, type_name=None, access_token=None):
         if access_token:
             return self._make_request('entity',
                 headers=dict(Authorization='OAuth %s' % access_token)
             )
-        else:
+        elif all([self.client_id, self.client_secret, type_name, uuid]):
             # TODO support other way to call entity
-            pass
+            return self._make_request('entity', method='post', data=dict(
+                client_id=self.client_id,
+                client_secret=self.client_secret,
+                type_name=type_name,
+                uuid=uuid
+            ))
+        else:
+            raise ValueError('Bad invocation of entity; needs either (client_id and client_secret) or access_token')
 
     def entity_update(self, uuid, type_name, update):
         return self._make_request('entity.update', method='post', data=dict(
