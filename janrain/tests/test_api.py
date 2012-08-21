@@ -10,7 +10,7 @@ class MockRequestsJsonResponse(object):
 
 class TestAPI(TestCase):
     def setUp(self):
-        self.client = JanrainClient('test_key', endpoint='test_endpoint')
+        self.client = JanrainClient('test_key', 1, 2, endpoint='test_endpoint')
         self.reqs = mock.Mock()
 
 
