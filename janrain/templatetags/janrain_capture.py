@@ -9,6 +9,7 @@ from functools import partial
 import re
 
 from django import template
+from django.conf import settings
 
 # TODO surely a helper exists for this in Django
 def literal_or_var(thing):
@@ -36,11 +37,11 @@ def maybe_resolve(context, thing):
     return thing.resolve(context) if type(thing) == template.Variable else thing
 
 class JanrainCaptureNode(template.Node):
-    def __init__(self, signin_or_register, app_id, client_id, domain):
+    def __init__(self, signin_or_register, domain):
         self.context = dict(
             signin_or_register=signin_or_register,
-            app_id = literal_or_var(app_id),
-            client_id = literal_or_var(client_id),
+            app_id = settings.JANRAIN_CAPTURE_APP_ID,
+            client_id = settings.JANRAIN_CAPTURE_CLIENT_ID,
             domain = literal_or_var(domain),
         )
 
@@ -56,11 +57,11 @@ def janrain_capture(signin_or_register, parser, token):
     if signin_or_register not in ('signin', 'register'):
         raise ValueError("you're probably doing this wrong, see janrain_capture_signin and janrain_capture_register")
     try:
-        tag_name, app_id, client_id, domain = token.split_contents()
+        tag_name, domain = token.split_contents()
     except ValueError:
-        raise template.TemplateSyntaxError('janrain_capture tag requires app_id, client_id, and domain arguments')
+        raise template.TemplateSyntaxError('janrain_capture tag requires domain argument')
 
-    return JanrainCaptureNode(signin_or_register, app_id, client_id, domain)
+    return JanrainCaptureNode(signin_or_register, domain)
 
 register = template.Library()
 register.tag('janrain_capture_signin', partial(janrain_capture, 'signin'))
