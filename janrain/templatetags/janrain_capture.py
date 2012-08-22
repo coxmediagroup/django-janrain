@@ -38,7 +38,7 @@ def maybe_resolve(context, thing):
 
 class JanrainCaptureNode(template.Node):
     def __init__(self, signin_or_register, domain):
-        self.context = dict(
+        self.data = dict(
             signin_or_register=signin_or_register,
             app_id = settings.JANRAIN_CAPTURE_APP_ID,
             client_id = settings.JANRAIN_CAPTURE_CLIENT_ID,
@@ -46,12 +46,12 @@ class JanrainCaptureNode(template.Node):
         )
 
     def render(self, context):
-        for key in ['app_id', 'client_id', 'domain']:
-            self.context[key] = maybe_resolve(context, self.context[key])
+        if type(self.data['domain']) == template.Variable:
+            self.data['domain'] = self.data['domain'].resolve(context)
 
         return """
         <iframe width="500px" height="1000px" src="https://{app_id}.janraincapture.com/oauth/{signin_or_register}?response_type=code&redirect_uri=http://{domain}/janrain/oauth_redirect&client_id={client_id}&xdreceiver=http://{domain}/janrain/xdcomm.html"></iframe>
-        """.format(**self.context)
+        """.format(**self.data)
 
 def janrain_capture(signin_or_register, parser, token):
     if signin_or_register not in ('signin', 'register'):
