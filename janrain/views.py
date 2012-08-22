@@ -56,8 +56,6 @@ class JanrainOauthRedirectView(JanrainView):
             code=code,
             redirect_uri=redirect_uri,
             grant_type='authorization_code',
-            client_id=client_id,
-            client_secret=client_secret,
         )
 
         if not response or 'error' in response:

@@ -11,7 +11,7 @@ class JanrainClient(object):
         self.client_secret = client_secret
 
     # Capture - Oauth
-    def oauth_token(self, code, redirect_uri, client_id, client_secret, grant_type='authorization_code'):
+    def oauth_token(self, code, redirect_uri, grant_type='authorization_code'):
         return self._make_request('oauth/token', method='post', data=dict(
             code=code,
             redirect_uri=redirect_uri,
