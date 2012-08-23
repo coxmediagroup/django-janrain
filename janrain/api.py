@@ -3,7 +3,18 @@ import json
 import requests
 import urlparse
 
+class APIException(Exception):
+    def __init__(self, method, response):
+        self.method = method
+        self.response = response
+
+    def __str__(self):
+        return "janrain %s return error response: %s" % (self.method, json.dumps(self.response))
+
+
 class JanrainClient(object):
+    APIException = APIException
+
     def __init__(self, api_key, client_id, client_secret, endpoint='https://rpxnow.com/api/v2/'):
         self.url = endpoint
         self.api_key = api_key
