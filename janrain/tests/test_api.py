@@ -50,3 +50,13 @@ class TestAPI(TestCase):
         with mock.patch('janrain.api.requests', self.reqs):
             self.client._make_request('path', method='post', headers=dict(Authorization="oauth"), data=dict(ohno='youdidnt'))
             self.reqs.post.assert_called_with('path', headers=dict(Authorization="oauth"), data=dict(ohno='youdidnt', apiKey='test_key'))
+            auth_info = self.client.auth_info('test_token')
+            self.assertEqual(len(auth_info.keys()), 1, 'got back our json')
+            self.assertEqual(auth_info['hello'], 'there', 'got back our json')
+            self.reqs.get.assert_called_with('auth_info', params=dict(token='test_token', apiKey='test_key'))
+
+    def test_clients_add(self):
+        pass
+
+    def test_settings_set_multi(self):
+        pass
