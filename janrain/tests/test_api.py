@@ -55,8 +55,42 @@ class TestAPI(TestCase):
             self.assertEqual(auth_info['hello'], 'there', 'got back our json')
             self.reqs.get.assert_called_with('auth_info', params=dict(token='test_token', apiKey='test_key'))
 
-    def test_clients_add(self):
-        pass
+    def test_clients_add_no_features(self):
+        self.reqs.post = mock.Mock(return_value=MockRequestsJsonResponse(dict(hello='there')))
+        with mock.patch('janrain.api.requests', self.reqs):
+            resp = self.client.clients_add('client_id', 'client_secret', 'description')
+            self.assertEqual(resp['hello'], 'there', 'got back our json')
+            self.reqs.post.assert_called_with('clients/add', data=dict(
+                apiKey='test_key',
+                client_id='client_id',
+                client_secret='client_secret',
+                description='description'
+            ))
+
+    def test_clients_add_with_features(self):
+        self.reqs.post = mock.Mock(return_value=MockRequestsJsonResponse(dict(hello='there')))
+        with mock.patch('janrain.api.requests', self.reqs):
+            resp = self.client.clients_add('client_id', 'client_secret',
+                'description', ["feature"])
+            self.assertEqual(resp['hello'], 'there', 'got back our json')
+            self.reqs.post.assert_called_with('clients/add', data=dict(
+                apiKey='test_key',
+                client_id='client_id',
+                client_secret='client_secret',
+                features='["feature"]',
+                description='description'
+            ))
 
     def test_settings_set_multi(self):
-        pass
+        self.reqs.post = mock.Mock(return_value=MockRequestsJsonResponse(dict(hello='there')))
+        with mock.patch('janrain.api.requests', self.reqs):
+            resp = self.client.settings_set_multi('client_id', 'client_secret',
+                'for_client_id', {'setting': 'value'})
+            self.assertEqual(resp['hello'], 'there', 'got back our json')
+            self.reqs.post.assert_called_with('settings/set_multi', data=dict(
+                apiKey='test_key',
+                client_id='client_id',
+                client_secret='client_secret',
+                for_client_id='for_client_id',
+                items='{"setting": "value"}',
+            ))
