@@ -15,9 +15,8 @@ class APIException(Exception):
 class JanrainClient(object):
     APIException = APIException
 
-    def __init__(self, api_key, client_id, client_secret, endpoint='https://rpxnow.com/api/v2/'):
-        self.url = endpoint
-        self.api_key = api_key
+    def __init__(self, client_id, client_secret, api_url):
+        self.url = api_url
         self.client_id = client_id
         self.client_secret = client_secret
 
@@ -84,7 +83,6 @@ class JanrainClient(object):
         """
             Actually make a web request.
         """
-        data['apiKey'] = data.get('api_key', self.api_key)
         method = method.lower()
         full_url = urlparse.urljoin(self.url, path)
 

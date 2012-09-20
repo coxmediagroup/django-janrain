@@ -10,7 +10,7 @@ class MockRequestsJsonResponse(object):
 
 class TestAPI(TestCase):
     def setUp(self):
-        self.client = JanrainClient('test_key', 1, 2, endpoint='test_endpoint')
+        self.client = JanrainClient(client_id=1, client_secret=2, api_url='test_endpoint')
         self.reqs = mock.Mock()
 
 
@@ -26,7 +26,7 @@ class TestAPI(TestCase):
         self.reqs.get = mock.Mock(return_value=MockRequestsJsonResponse(dict(hello='there')))
         with mock.patch('janrain.api.requests', self.reqs):
             self.client._make_request('path', data=dict(ohno='youdidnt'))
-            self.reqs.get.assert_called_with('path', headers=dict(), params=dict(ohno='youdidnt', apiKey='test_key'))
+            self.reqs.get.assert_called_with('path', headers=dict(), params=dict(ohno='youdidnt'))
 
     def test__make_request_post(self):
         self.reqs.post = mock.Mock(return_value=MockRequestsJsonResponse(dict(you='guys')))
@@ -40,7 +40,7 @@ class TestAPI(TestCase):
         self.reqs.post = mock.Mock(return_value=MockRequestsJsonResponse(dict(you='guys')))
         with mock.patch('janrain.api.requests', self.reqs):
             self.client._make_request('path', method='post', data=dict(ohno='youdidnt'))
-            self.reqs.post.assert_called_with('path', headers=dict(), data=dict(ohno='youdidnt', apiKey='test_key'))
+            self.reqs.post.assert_called_with('path', headers=dict(), data=dict(ohno='youdidnt'))
 
     def test__make_request_bad_method(self):
         self.assertRaises(ValueError, self.client._make_request, 'path', method='foobarbaz')
@@ -49,7 +49,7 @@ class TestAPI(TestCase):
         self.reqs.post = mock.Mock(return_value=MockRequestsJsonResponse(dict(you='guys')))
         with mock.patch('janrain.api.requests', self.reqs):
             self.client._make_request('path', method='post', headers=dict(Authorization="oauth"), data=dict(ohno='youdidnt'))
-            self.reqs.post.assert_called_with('path', headers=dict(Authorization="oauth"), data=dict(ohno='youdidnt', apiKey='test_key'))
+            self.reqs.post.assert_called_with('path', headers=dict(Authorization="oauth"), data=dict(ohno='youdidnt'))
 
     def test_clients_add_no_features(self):
         self.reqs.post = mock.Mock(return_value=MockRequestsJsonResponse(dict(hello='there')))
@@ -57,7 +57,6 @@ class TestAPI(TestCase):
             resp = self.client.clients_add('client_id', 'client_secret', 'description')
             self.assertEqual(resp['hello'], 'there', 'got back our json')
             self.reqs.post.assert_called_with('clients/add', headers={}, data=dict(
-                apiKey='test_key',
                 client_id='client_id',
                 client_secret='client_secret',
                 description='description'
@@ -70,7 +69,6 @@ class TestAPI(TestCase):
                 'description', ["feature"])
             self.assertEqual(resp['hello'], 'there', 'got back our json')
             self.reqs.post.assert_called_with('clients/add', headers={}, data=dict(
-                apiKey='test_key',
                 client_id='client_id',
                 client_secret='client_secret',
                 features='["feature"]',
@@ -84,7 +82,6 @@ class TestAPI(TestCase):
                 'for_client_id', {'setting': 'value'})
             self.assertEqual(resp['hello'], 'there', 'got back our json')
             self.reqs.post.assert_called_with('settings/set_multi', headers={}, data=dict(
-                apiKey='test_key',
                 client_id='client_id',
                 client_secret='client_secret',
                 for_client_id='for_client_id',
