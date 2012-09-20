@@ -78,17 +78,6 @@ class JanrainClient(object):
             'for_client_id': for_client_id,
         })
 
-    # Engage
-    def auth_info(self, token):
-        return self._make_request('auth_info', data=dict(token=token))
-
-    # Engage - Mappings
-    def map(self, identifier, primary_key, overwrite=True):
-        return self._make_request('map', method='post', data=dict(
-            identifier=identifier,
-            primaryKey=primary_key,
-            overwrite='true' if overwrite else 'false'
-        ))
     # TODO you know, the rest of the API.
 
     def _make_request(self, path, method='get', data={}, headers={}):
