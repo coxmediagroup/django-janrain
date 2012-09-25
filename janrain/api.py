@@ -58,10 +58,10 @@ class JanrainClient(object):
 
 
     # Capture - clients/add
-    def clients_add(self, client_id, client_secret, description, features=None):
+    def clients_add(self, description, features=None):
         req = {
-            'client_id': client_id,
-            'client_secret': client_secret,
+            'client_id': self.client_id,
+            'client_secret': self.client_secret,
             'description': description,
         }
         if features:
@@ -69,10 +69,10 @@ class JanrainClient(object):
         return self._make_request('clients/add', data=req, method='post')
 
     # Client - settings/set_multi
-    def settings_set_multi(self, client_id, client_secret, for_client_id, items):
+    def settings_set_multi(self, for_client_id, items):
         return self._make_request('settings/set_multi', method='post', data={
-            'client_id': client_id,
-            'client_secret': client_secret,
+            'client_id': self.client_id,
+            'client_secret': self.client_secret,
             'items': json.dumps(items),
             'for_client_id': for_client_id,
         })
