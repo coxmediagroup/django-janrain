@@ -57,6 +57,13 @@ class JanrainClient(object):
         ))
 
 
+    # Capture - clients/list
+    def clients_list(self):
+        return self._make_request('clients/list', data={
+            'client_id': self.client_id,
+            'client_secret': self.client_secret,
+        })
+
     # Capture - clients/add
     def clients_add(self, description, features=None):
         req = {
