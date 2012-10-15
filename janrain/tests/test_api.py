@@ -87,3 +87,13 @@ class TestAPI(TestCase):
                 for_client_id='for_client_id',
                 items='{"setting": "value"}',
             ))
+
+    def test_clients_list(self):
+        self.reqs.get = mock.Mock(return_value=MockRequestsJsonResponse(dict(hello='there')))
+        with mock.patch('janrain.api.requests', self.reqs):
+            resp = self.client.clients_list()
+            self.assertEqual(resp['hello'], 'there', 'got back our json')
+            self.reqs.get.assert_called_with('clients/list', headers={}, params=dict(
+                client_id=1,
+                client_secret=2,
+            ))
