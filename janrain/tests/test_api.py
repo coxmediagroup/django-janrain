@@ -54,23 +54,22 @@ class TestAPI(TestCase):
     def test_clients_add_no_features(self):
         self.reqs.post = mock.Mock(return_value=MockRequestsJsonResponse(dict(hello='there')))
         with mock.patch('janrain.api.requests', self.reqs):
-            resp = self.client.clients_add('client_id', 'client_secret', 'description')
+            resp = self.client.clients_add('description')
             self.assertEqual(resp['hello'], 'there', 'got back our json')
             self.reqs.post.assert_called_with('clients/add', headers={}, data=dict(
-                client_id='client_id',
-                client_secret='client_secret',
+                client_id=1,
+                client_secret=2,
                 description='description'
             ))
 
     def test_clients_add_with_features(self):
         self.reqs.post = mock.Mock(return_value=MockRequestsJsonResponse(dict(hello='there')))
         with mock.patch('janrain.api.requests', self.reqs):
-            resp = self.client.clients_add('client_id', 'client_secret',
-                'description', ["feature"])
+            resp = self.client.clients_add('description', ["feature"])
             self.assertEqual(resp['hello'], 'there', 'got back our json')
             self.reqs.post.assert_called_with('clients/add', headers={}, data=dict(
-                client_id='client_id',
-                client_secret='client_secret',
+                client_id=1,
+                client_secret=2,
                 features='["feature"]',
                 description='description'
             ))
@@ -78,12 +77,11 @@ class TestAPI(TestCase):
     def test_settings_set_multi(self):
         self.reqs.post = mock.Mock(return_value=MockRequestsJsonResponse(dict(hello='there')))
         with mock.patch('janrain.api.requests', self.reqs):
-            resp = self.client.settings_set_multi('client_id', 'client_secret',
-                'for_client_id', {'setting': 'value'})
+            resp = self.client.settings_set_multi('for_client_id', {'setting': 'value'})
             self.assertEqual(resp['hello'], 'there', 'got back our json')
             self.reqs.post.assert_called_with('settings/set_multi', headers={}, data=dict(
-                client_id='client_id',
-                client_secret='client_secret',
+                client_id=1,
+                client_secret=2,
                 for_client_id='for_client_id',
                 items='{"setting": "value"}',
             ))
