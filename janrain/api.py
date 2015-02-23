@@ -84,6 +84,15 @@ class JanrainClient(object):
             'for_client_id': for_client_id,
         })
 
+    # Capture - clients/delete
+    def clients_delete(self, client):
+        req = {
+            'client_id': self.client_id,
+            'client_secret': self.client_secret,
+            'client_id_for_deletion': client_id_for_deletion,
+        }
+        return self._make_request('clients/delete', data=req, method='post')
+
     # TODO you know, the rest of the API.
 
     def _make_request(self, path, method='get', data={}, headers={}):
