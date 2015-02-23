@@ -85,7 +85,7 @@ class JanrainClient(object):
         })
 
     # Capture - clients/delete
-    def clients_delete(self, client):
+    def clients_delete(self, client, client_id_for_deletion):
         req = {
             'client_id': self.client_id,
             'client_secret': self.client_secret,
